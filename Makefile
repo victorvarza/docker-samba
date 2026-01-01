@@ -20,6 +20,15 @@ build:
 push:
 	docker push ${IMAGE}
 
+buildx-setup:
+	docker buildx create --name samba-builder --use --bootstrap || docker buildx use samba-builder
+
+buildx:
+	docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} src/ --load
+
+buildx-push:
+	docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} src/ --push
+
 stop:
 	docker stop ${CONTAINER_NAME}
 
@@ -29,4 +38,4 @@ logs:
 clean:
 	docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
 
-.PHONY: run build push stop logs clean
+.PHONY: run build buildx-setup buildx buildx-push push stop logs clean
